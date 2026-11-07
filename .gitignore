@@ -1,0 +1,23 @@
+# 构建产物
+build/
+*.3dsx
+*.elf
+*.smdh
+*.cia
+*.map
+
+# 从原版游戏提取的资源，不入库
+data/
+romfs/
+
+# 只读参考源码（GMUD 汇编整理）与本地第三方工具
+ref/
+.tools/
+
+# 编辑器
+.vscode/
+*.user
+
+# Python
+__pycache__/
+*.pyc

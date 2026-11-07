@@ -1,0 +1,171 @@
+BasicInfo:
+  Title                   : GMUD 3DS
+  ProductCode             : CTR-P-GMUD
+  Logo                    : Homebrew
+
+RomFs:
+  RootPath                : build/cia/romfs_src
+
+TitleInfo:
+  Category                : Application
+  UniqueId                : 0x74D55
+  # 注意：Application 的 Version 会被 makerom 写进 Title ID 的最低字节
+  # (variation)，必须是 0，否则 TID 变成 ...D5501，真机拒绝启动并弹
+  # “エラーが発生しました”。TMD 版本请用命令行 -ver 设置。
+  Version                 : 0
+
+Option:
+  UseOnSD                 : true
+  FreeProductCode         : true
+  MediaFootPadding        : false
+  EnableCrypt             : true
+  EnableCompress          : true
+
+# 重要：build_cia.sh 用 `-desc app:4` 让 makerom 使用内置 AccessDesc 模板。
+# 该模式下 makerom 只从本文件读取"限制类"字段（FileSystemAccess /
+# StackSize / SaveDataSize / DescVersion / RomFs / TitleInfo）；
+# 下面的 Priority / Memory* / ServiceAccessControl / SystemCallAccess /
+# IORegisterMapping / MemoryMapping / SystemControlInfo-Dependency 都会被
+# 模板值取代（模板本身是完整的 homebrew 配置：svc 1-61、28 个常用服务、
+# DSP IO 映射齐全）。需要完全自定义权限时，去掉脚本里的 -desc 再打包。
+AccessControlInfo:
+  CoreVersion             : 2
+  DescVersion             : 2
+  ReleaseKernelMajor      : "02"
+  ReleaseKernelMinor      : "33"
+  UseExtSaveData          : false
+
+  # 存档写入 sdmc:/3ds/gmud/
+  # DirectSdmc=只读 sdmc:/，DirectSdmcWrite=可写（缺它存档会失败）
+  FileSystemAccess:
+   - DirectSdmc
+   - DirectSdmcWrite
+
+  MemoryType                    : Application
+  SystemMode                    : 64MB
+  IdealProcessor                : 0
+  AffinityMask                  : 1
+  Priority                      : 16
+  MaxCpu                        : 0
+  HandleTableSize               : 0x200
+  DisableDebug                  : false
+  EnableForceDebug              : false
+  CanWriteSharedPage            : true
+  CanUsePrivilegedPriority      : false
+  CanUseNonAlphabetAndNumber    : true
+  PermitMainFunctionArgument    : true
+  CanShareDeviceMemory          : true
+  RunnableOnSleep               : false
+  SpecialMemoryArrange          : true
+
+  SystemModeExt                 : 124MB
+  CpuSpeed                      : 804MHz
+  EnableL2Cache                 : true
+  CanAccessCore2                : true
+
+  IORegisterMapping:
+   - 1ff00000-1ff7ffff
+  MemoryMapping:
+   - 1f000000-1f5fffff:r
+
+  SystemCallAccess:
+    ControlMemory: 1
+    QueryMemory: 2
+    ExitProcess: 3
+    GetProcessIdealProcessor: 6
+    CreateThread: 8
+    ExitThread: 9
+    SleepThread: 10
+    GetThreadPriority: 11
+    SetThreadPriority: 12
+    GetThreadIdealProcessor: 15
+    GetCurrentProcessorNumber: 17
+    CreateMutex: 19
+    ReleaseMutex: 20
+    CreateSemaphore: 21
+    CreateEvent: 23
+    SignalEvent: 24
+    ClearEvent: 25
+    CreateTimer: 26
+    SetTimer: 27
+    CancelTimer: 28
+    ClearTimer: 29
+    CreateMemoryBlock: 30
+    MapMemoryBlock: 31
+    UnmapMemoryBlock: 32
+    CreateAddressArbiter: 33
+    ArbitrateAddress: 34
+    CloseHandle: 35
+    WaitSynchronization1: 36
+    WaitSynchronizationN: 37
+    WaitSynchronization: 38
+    DuplicateHandle: 39
+    GetSystemTick: 40
+    GetHandleInfo: 41
+    GetSystemInfo: 42
+    GetProcessInfo: 43
+    ConnectToPort: 45
+    SendSyncRequest1: 46
+    SendSyncRequest2: 47
+    SendSyncRequest3: 48
+    SendSyncRequest4: 49
+    SendSyncRequest: 50
+    GetProcessId: 53
+    GetThreadId: 54
+    GetResourceLimit: 56
+    GetResourceLimitLimitValues: 57
+    GetResourceLimitCurrentValues: 58
+    Break: 60
+    Backdoor: 123
+
+  # gfx(gsp::Gpu) / 输入(hid:USER) / 文件系统(fs:USER) / applet(APT:U,am:net)
+  # / cfg / ndm / pxi / dsp / ptm
+  ServiceAccessControl:
+   - cfg:u
+   - fs:USER
+   - gsp::Gpu
+   - hid:USER
+   - ndm:u
+   - pxi:dev
+   - APT:U
+   - ac:u
+   - am:net
+   - dsp::DSP
+   - ptm:u
+
+SystemControlInfo:
+  SaveDataSize: 0K
+  RemasterVersion: 0
+  StackSize: 0x40000
+
+  Dependency:
+    ac: 0x0004013000002402
+    am: 0x0004013000001502
+    boss: 0x0004013000003402
+    camera: 0x0004013000001602
+    cecd: 0x0004013000002602
+    cfg: 0x0004013000001702
+    codec: 0x0004013000001802
+    csnd: 0x0004013000002702
+    dlp: 0x0004013000002802
+    dsp: 0x0004013000001a02
+    friends: 0x0004013000003202
+    gpio: 0x0004013000001b02
+    gsp: 0x0004013000001c02
+    hid: 0x0004013000001d02
+    http: 0x0004013000002902
+    i2c: 0x0004013000001e02
+    ir: 0x0004013000003302
+    mcu: 0x0004013000001f02
+    mic: 0x0004013000002002
+    ndm: 0x0004013000002b02
+    news: 0x0004013000003502
+    nim: 0x0004013000002c02
+    nwm: 0x0004013000002d02
+    pdn: 0x0004013000002102
+    ps: 0x0004013000003102
+    ptm: 0x0004013000002202
+    ro: 0x0004013000003702
+    socket: 0x0004013000002e02
+    spi: 0x0004013000002302
+    ssl: 0x0004013000002f02
